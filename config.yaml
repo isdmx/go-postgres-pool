@@ -1,0 +1,27 @@
+DB:
+  Database: test
+  Host: 127.0.0.1:5432
+  User: "test"
+  Password: "secret"
+
+  Pool:
+    MinConns: 4
+    MaxConns: 8
+    MaxConnIdleTime: 60s
+    MaxConnLifetime: 300s
+    MaxConnLifetimeJitter: 10s
+    HealthCheckPeriod: 30s
+
+  TLS:
+    Enabled: false
+    CACert: /etc/ssl/ca.pem
+    ClientCert: /etc/ssl/cert.pem
+    ClientKey: /etc/ssl/key.pem
+    SkipVerify: false
+
+  # see: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+  # runtime: https://pkg.go.dev/github.com/jackc/pgx/v5#ParseConfig
+  Params:
+    search_path: "test"
+    application_name: "smack"
+    default_query_exec_mode: "cache_describe"
