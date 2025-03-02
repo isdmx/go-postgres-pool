@@ -1,4 +1,4 @@
-module github.com/iliadmitriev/go-postgres-pool
+module github.com/isdmx/go-postgresql-pool
 
 go 1.23.6
 

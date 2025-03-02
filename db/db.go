@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	stdlib "github.com/jackc/pgx/v5/stdlib"
 
-	"github.com/iliadmitriev/go-postgres-pool/config"
+	"github.com/isdmx/go-postgresql-pool/config"
 )
 
 func New(ctx context.Context, cfg *config.DBConfig) (*sql.DB, error) {

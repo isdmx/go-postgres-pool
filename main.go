@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/iliadmitriev/go-postgres-pool/config"
-	"github.com/iliadmitriev/go-postgres-pool/db"
+	"github.com/isdmx/go-postgresql-pool/config"
+	"github.com/isdmx/go-postgresql-pool/db"
 )
 
 func main() {
