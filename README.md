@@ -49,3 +49,19 @@ SELECT
    EXTRACT(EPOCH FROM pg_last_xact_replay_timestamp())
   )::int AS lag;
 ```
+
+```postgresql
+SELECT
+    pid AS session_id,
+    usename AS username,
+    application_name,
+    client_addr AS client_ip,
+    state,
+    state_change,
+    query,
+    backend_start
+FROM
+    pg_stat_activity
+WHERE
+    state IS NOT NULL;
+```
