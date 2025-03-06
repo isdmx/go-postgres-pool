@@ -8,7 +8,7 @@ import (
 
 type DBConfig struct {
 	Database string
-	Host     string
+	Host     []string
 	User     string
 	Password string
 	Pool     Pool
@@ -33,7 +33,9 @@ type TLSConfig struct {
 	SkipVerify bool
 }
 
-func LoadConfig(path string) (*DBConfig, error) {
+type Options func(cfg *DBConfig)
+
+func LoadConfig(path string, otps ...Options) (*DBConfig, error) {
 	viper.SetConfigFile(path)
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
@@ -44,5 +46,21 @@ func LoadConfig(path string) (*DBConfig, error) {
 		return nil, err
 	}
 
+	for _, opt := range otps {
+		opt(&cfg)
+	}
+
 	return &cfg, nil
+}
+
+func WithWrite() Options {
+	return func(cfg *DBConfig) {
+		cfg.Params["target_session_attrs"] = "read-write"
+	}
+}
+
+func WithReadOnly() Options {
+	return func(cfg *DBConfig) {
+		cfg.Params["target_session_attrs"] = "read-only"
+	}
 }

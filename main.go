@@ -2,40 +2,65 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
-	"time"
+
+	"github.com/sourcegraph/conc/pool"
 
 	"github.com/isdmx/go-postgres-pool/config"
 	"github.com/isdmx/go-postgres-pool/db"
 )
 
 func main() {
-	cfg, err := config.LoadConfig("config.yaml")
+	cfgW, err := config.LoadConfig("config.yaml", config.WithWrite())
 	if err != nil {
 		log.Fatalf("Could not load config: %v", err)
 	}
 
 	ctx := context.Background()
-	dbPool, err := db.New(ctx, cfg)
+	dbPoolW, err := db.New(ctx, cfgW)
 	if err != nil {
 		log.Fatalf("Could not create database pool: %v", err)
 	}
-	defer dbPool.Close()
+	defer dbPoolW.Close()
 
-	if err := dbPool.Ping(); err != nil {
+	if err := dbPoolW.Ping(); err != nil {
 		log.Fatalf("Could not ping database: %v", err)
 	}
 
-	row, _ := dbPool.QueryContext(ctx, "SELECT * FROM generate_series(2,50);")
+	cfgR, err := config.LoadConfig("config.yaml", config.WithReadOnly())
+	if err != nil {
+		log.Fatalf("Could not load config: %v", err)
+	}
 
-	for row.Next() {
-		var value int
-		if err := row.Scan(&value); err != nil {
-			log.Fatalf("Could not scan row: %v", err)
-		}
-		log.Printf("Value: %d", value)
-		time.Sleep(5 * time.Second)
+	dbPoolR, err := db.New(ctx, cfgR)
+	if err != nil {
+		log.Fatalf("Could not create database pool: %v", err)
+	}
+	defer dbPoolR.Close()
+
+	if err := dbPoolW.Ping(); err != nil {
+		log.Fatalf("Could not ping database: %v", err)
+	}
+
+	cluster := []*sql.DB{dbPoolW, dbPoolR}
+
+	p := pool.New().WithMaxGoroutines(200)
+
+	for i := range 1000 {
+		v := i
+		p.Go(func() {
+			db := cluster[v%len(cluster)]
+			res, err := db.QueryContext(ctx, "select pg_sleep(4);")
+			defer func() { _ = res.Close() }()
+
+			if err != nil {
+				log.Printf("Could not execute query: %v\n", err)
+			}
+
+			log.Printf("Executed query %d\n", v)
+		})
 	}
 
 	fmt.Println("Successfully connected to the database!")

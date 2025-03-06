@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	stdlib "github.com/jackc/pgx/v5/stdlib"
@@ -61,7 +62,7 @@ func buildConnectionString(cfg *config.DBConfig) (string, error) {
 	u := &url.URL{
 		Scheme: "postgres",
 		User:   url.UserPassword(cfg.User, cfg.Password),
-		Host:   cfg.Host,
+		Host:   strings.Join(cfg.Host, ","),
 		Path:   cfg.Database,
 	}
 

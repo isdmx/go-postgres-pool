@@ -1,12 +1,14 @@
 DB:
   Database: test
-  Host: 127.0.0.1:5432
+  Host:
+    - 127.0.0.1:5432
+    - 127.0.0.1:5433
   User: "test"
   Password: "secret"
 
   Pool:
     MinConns: 4
-    MaxConns: 8
+    MaxConns: 60
     MaxConnIdleTime: 60s
     MaxConnLifetime: 300s
     MaxConnLifetimeJitter: 10s
@@ -25,3 +27,5 @@ DB:
     search_path: "test"
     application_name: "smack"
     default_query_exec_mode: "cache_describe"
+    # target_session_attrs: any
+    # load_balance_hosts: random
