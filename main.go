@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/sourcegraph/conc/pool"
 
@@ -63,5 +64,8 @@ func main() {
 		})
 	}
 
-	fmt.Println("Successfully connected to the database!")
+	p.Wait()
+
+	fmt.Println("finished")
+	time.Sleep(20 * time.Second)
 }
